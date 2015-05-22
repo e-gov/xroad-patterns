@@ -114,7 +114,7 @@ As depicted on figure \ref{fig:p:5:async}, processing of a request is comprised 
 	\item The message is added to the request queue
 	\item In case the response does not carry meaning or will be delivered later, a message is sent to the security server confirming message delivery
 	\item The worker reads a message from the request queue 
-	\item The message is transformed to a format the information system understands by striping (but not discarding!) headers. It is likely that at this point a protocol transformation also takes place by, for example, making a request towards a CORBA\footnote{CORBA stands for Common Object Request TODO. It is an older remote command invocation protocol mainly used in enterprise-class solutions} server. 
+	\item The message is transformed to a format the information system understands by striping (but not discarding!) headers. It is likely that at this point a protocol transformation also takes place by, for example, making a request towards a CORBA\footnote{CORBA stands for Common Object Request. It is an older remote command invocation protocol mainly used in enterprise-class solutions} server. 
 	\item In case the response from the information system is meaningful, it is transformed into a message the adapter can understand and posted to the response queue
 	\item The adapter server reads a message from the response queue and matches it to a request so it can be delivered
 	\item In case the customer is still waiting, the response is delivered
@@ -180,7 +180,7 @@ In case of high-volume or high-importance interaction, it is often important to 
 \end{description}
 
 \subsection{Details}
-Figure \ref{fig:p:9} contains the component diagram of the reconciliator pattern. The adapter component is responsible for intermediating a service from the security server to the information system. When doing that, it logs the interaction along with its outcome in the communication log. Note, that this creates a problem known as multi-phase commit\index{multi-phase commit}: we must make sure that the service outcome in the information system and the log are the same. While this is the same fundamental problem the pattern is meant to solve, both parties of the issue are now local and one of them, the communication log, can be very simple. Having reduced the problem to a well-known one (TODO: insert pattern reference here), we leave the detailed solution to the reader as an exercise. The communication log exposes an additional interface to the security server allowing for access to the stored log events. These can be accessed then by the information system on Bob's side so system states can be compared. The event log might be detailed listing all logs with outcomes, might just contain failed interactions or just consist of aggregate results like sums. To limit the potential size and complexity of the reports, it is recommended that a maximum reconciliation horizon is agreed upon between parties.
+Figure \ref{fig:p:9} contains the component diagram of the reconciliator pattern. The adapter component is responsible for intermediating a service from the security server to the information system. When doing that, it logs the interaction along with its outcome in the communication log. Note, that this creates a problem known as multi-phase commit\index{multi-phase commit}: we must make sure that the service outcome in the information system and the log are the same. While this is the same fundamental problem the pattern is meant to solve, both parties of the issue are now local and one of them, the communication log, can be very simple. Having reduced the problem to a well-known one, we leave the detailed solution to the reader as an exercise. The communication log exposes an additional interface to the security server allowing for access to the stored log events. These can be accessed then by the information system on Bob's side so system states can be compared. The event log might be detailed listing all logs with outcomes, might just contain failed interactions or just consist of aggregate results like sums. To limit the potential size and complexity of the reports, it is recommended that a maximum reconciliation horizon is agreed upon between parties.
 
 The pattern can be implemented as two mirrored instances allowing for both parties to request for the state of the other. Although it is preferable the reconciliation to be automated, the pattern does not enforce it and the discrepancies found might be routed to a human agent for resolution.
 
@@ -212,8 +212,46 @@ The pattern can be implemented as two mirrored instances allowing for both parti
 \subsection{Operational considerations}
 Form the operational perspective, the pattern offers few specific challenges. Although it is designed for easy recovery from system failures, excessive reliance on its abilities can cause of domino effect where a voluminous reconciliation report causes one of the systems to under-perform leading to more failed messages and more need for reconciliation. Also, the message log and information system must operationally be thought of as a logical entity, i.e. they should be backed up and recovered in a way that does not compromise their synchronicity. 
 
+Since a two-phase commit problem now exists between an information system and the communication log, these two should be deployed in a way that minimises network uncertainty. Ideally, a shared transactional context might be used but shared hardware also provides some assurance. 
+
 In terms of monitoring, the communication log is meant to potentially be able to recover from data loss spanning the entire life time of the system. For large and old systems, this might lead to unreasonable storage requirements. Thus it is recommended that the reconciliation horizon is agreed upon and enforced. 
 
+\section{Read-through cache}
+\label{sec:p:13}
+\subsection{Overview}
+\subsection{Summary}
+Sometimes Alice does not need all of the data from Bob but would like to get rapid and independent answers to requests. In that case, Alice can implement a stub service that responds to all queries based on locally stored data or, if that is missing, executes a query towards Bob and caches the result. It might be that both options are used: while a local copy is served for speed, the cache is updated by requesting fresh information from Bob. The pattern is depicted on figure \ref{fig:p:13}.
+
+\begin{figure}[htp]
+	\begin{center}
+		\includegraphics[width=1\textwidth]{13_comp.png}
+		\caption{Read-through cache pattern}
+		\label{fig:p:13}
+	\end{center}
+\end{figure}
+
+\subsection{Details}
+\subsection{SWOT}
+\subsubsection{Strengths}
+	\begin{itemize}
+ 		\item strength  
+	\end{itemize}
+	
+\subsubsection{Weaknesses}	
+	 	\begin{itemize}
+			\item Weakness
+		\end{itemize}
+
+\subsubsection{Opportunities}	
+	 	\begin{itemize}
+			\item Opportunity
+		\end{itemize}
+\subsubsection{Threats}	
+	 	\begin{itemize}
+			\item threat
+		\end{itemize}
+
+\subsection{Operational considerations}
 
 \clearpage
 
