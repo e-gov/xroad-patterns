@@ -53,7 +53,7 @@ ID & Pattern & Doc & Data & Service & Volume & Doc direction & Availability \\
 5 & Async xRoad provider/consumer & X & X & X & L & U/D & $\leq$ \\
 7 & Async xRoad SS & X & X &  & M & B & eq \\
 8 & Gateway to xRoad &  & X & X & L &   & $\geq$ \\
-9 & Reconciliator & X & X & X & XL & B & eq \\
+9 & Reconciliator & X & X & X & XL & B & $\leq$ \\
 10 & Dead Letter & X & X &  & XL & U & > \\
 11 & Document store & X & X &  & L & U & > \\
 12 & Replica &  & X &  & XL &   & $\gg$ \\
@@ -165,11 +165,19 @@ Finally, this patterns can grow operationally more complex if more than one inst
 In case of high-volume or high-importance interaction, it is often important to make sure both sides have the same understanding of what has happened and detect errors. The errors might be caused by technical issues in the communication stack, by failures of either party or because of logical discrepancies stemming, for example, from different interpretations of the response codes. Detection and automated recovery of such errors is especially important in financial settings where, for example, books might be closed daily. For this purpose, a detailed log of all interactions is kept and a special subsystem frequently attempts to reconcile that log with Bob. For simple cases, both Alice and Bob might expose an interface for just comparing the sum of all transactions processed but in more complex settings detailed information like a list of all package IDs might be exchanged. The pattern is depicted on figure \ref{fig:p:9}.
 \begin{figure}[htp]
 	\begin{center}
-%		\includegraphics[width=1\textwidth]{gfx/9_component.png}
+		\includegraphics[width=1\textwidth]{9_comp.png}
 		\caption{Reconciliator pattern}
 		\label{fig:p:9}
 	\end{center}
 \end{figure}
+
+\subsection{Summary}
+\begin{description}
+	\item[Paradigm orientation] The pattern is suitable for documents, data and service
+	\item[Volume preference] Unless a very noisy communication channel is used, the pattern only becomes useful under very large request volumes
+	\item[Direction] The pattern is agnostic towards service direction and could be used by both parties simultaneously
+	\item[Availability] The pattern is suitable for situations where the availability requirements of the Alice side are higher than on Bob's side
+\end{description}
 
 \subsection{Details}
 Figure \ref{fig:p:9} contains the component diagram of the reconciliator pattern. The adapter component is responsible for intermediating a service from the security server to the information system. When doing that, it logs the interaction along with its outcome in the communication log. Note, that this creates a problem known as multi-phase commit\index{multi-phase commit}: we must make sure that the service outcome in the information system and the log are the same. While this is the same fundamental problem the pattern is meant to solve, both parties of the issue are now local and one of them, the communication log, can be very simple. Having reduced the problem to a well-known one (TODO: insert pattern reference here), we leave the detailed solution to the reader as an exercise. The communication log exposes an additional interface to the security server allowing for access to the stored log events. These can be accessed then by the information system on Bob's side so system states can be compared. The event log might be detailed listing all logs with outcomes, might just contain failed interactions or just consist of aggregate results like sums. To limit the potential size and complexity of the reports, it is recommended that a maximum reconciliation horizon is agreed upon between parties.
