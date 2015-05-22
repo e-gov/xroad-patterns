@@ -22,13 +22,13 @@
 
 \maketitle
 \clearpage
-
+\setcounter{tocdepth}{2}
 \tableofcontents
 \clearpage
 
 \section{Background}
 \subsection{Introduction}
-This is document seeks to collect descriptions of architectural patterns that make sense to be used around x-road. The patterns identified are listed in \ref{tab:dir}, but currently only two of them have been described in detail (see \ref{sec:goals}).
+This is document seeks to collect descriptions of architectural patterns that make sense to be used around x-road. The patterns identified are listed in \ref{tab:dir}, but currently only two of them have been described in detail.
 
 While all the patterns are usable, no tool is usable for every purpose. Therefore, the patterns are each classified along a set of dimensions allowing for easier navigation and comprehension. The dimensions are defined as follows:
 \begin{description}
@@ -37,6 +37,8 @@ While all the patterns are usable, no tool is usable for every purpose. Therefor
 	\item[Doc direction] Not all patterns are symmetrical in nature. If a document is passed in a transaction, it can move up, down or both ways of the stream. This column indicates, whether the pattern works well for up-stream documents (U), downstream documents (D) or can handle both directions equally well (B). The patterns not suitable for documents are not marked in this column
 	 \item[Availability] The systems being integrated might have different availability requirements. If they do, it is important to make sure the availability of one system is not compromised by the availability of the other. This dimension indicates, how the availability of the system in question compares with the one of the integrated system
 \end{description}
+
+In the document, Alice is used to denote the organisation implementing the pattern whether as a consumer or provider with Bob referring to the other side of the interaction.
 
 \begin{table}
 	\begin{center}
@@ -66,16 +68,6 @@ ID & Pattern & Doc & Data & Service & Volume & Doc direction & Availability \\
 	\end{center}
 \end{table}
 
-\subsection{Goals}
-\label{sec:goals}
-This document has the following goals:
-\begin{enumerate}
-	\item To confirm a practical need for such a pattern directory
-	\item Validate the structure of the pattern descriptions so the document is on solid footing
-    \item To validate the document life-cycle work-flow
-    \item Provide documentation for two practically used patterns
-\end{enumerate}
-
 \section{Asynchronous x-road provider/consumer}
 \label{sec:p:5}
 \subsection{Overview}
@@ -83,12 +75,19 @@ It is usually undesirable that the dynamic complexity \index{Dynamic complexity!
 
 \begin{figure}[htp]
 	\begin{center}
-		\includegraphics[width=1\textwidth]{gfx/5.png}
+		\includegraphics[width=1\textwidth]{5_comp.png}
 		\caption{Asynchronous xRoad provider/consumer pattern}
 		\label{fig:p:5}
 	\end{center}
 \end{figure}
- TODO: insert summary of properties here
+
+\subsection{Summary}
+\begin{description}
+	\item[Paradigm orientation] The pattern is suitable for documents, data and service
+	\item[Volume preference] Although message queueing and transformation adds overhead, the pattern is still usable for large request volumes
+	\item[Direction] The pattern is intended for consuming services but, when reversed, can be used for provision equally well
+	\item[Availability] The pattern is suitable for situations where the availability requirements of the Alice side are much higher than on Bob's side
+\end{description}
 
 \subsection{Details}
 The function of components depicted on figure \ref{fig:p:5} is as follows.
@@ -100,7 +99,7 @@ Regardless of other details, the adapter and worker must implement an identical 
 
 \begin{figure}[htp]
 	\begin{center}
-		\includegraphics[width=\textwidth]{gfx/5_sequence.png}
+		\includegraphics[width=.85\textwidth]{5_seq.png}
 		\caption{Sequence diagram of the asynchronous service provider}
 		\label{fig:p:5:async}
 	\end{center}
@@ -166,7 +165,7 @@ Finally, this patterns can grow operationally more complex if more than one inst
 In case of high-volume or high-importance interaction, it is often important to make sure both sides have the same understanding of what has happened and detect errors. The errors might be caused by technical issues in the communication stack, by failures of either party or because of logical discrepancies stemming, for example, from different interpretations of the response codes. Detection and automated recovery of such errors is especially important in financial settings where, for example, books might be closed daily. For this purpose, a detailed log of all interactions is kept and a special subsystem frequently attempts to reconcile that log with Bob. For simple cases, both Alice and Bob might expose an interface for just comparing the sum of all transactions processed but in more complex settings detailed information like a list of all package IDs might be exchanged. The pattern is depicted on figure \ref{fig:p:9}.
 \begin{figure}[htp]
 	\begin{center}
-		\includegraphics[width=1\textwidth]{gfx/9_component.png}
+%		\includegraphics[width=1\textwidth]{gfx/9_component.png}
 		\caption{Reconciliator pattern}
 		\label{fig:p:9}
 	\end{center}
